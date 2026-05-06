@@ -51,7 +51,7 @@ export default function Index() {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const r = await fetchStations({ lat: loc.lat, lng: loc.lng, rad: radius, type: fuel, sort });
+      const r = await fetchStations({ lat: loc.lat, lng: loc.lng, rad: radius, type: "all", sort });
       if (cancelled) return;
       if (r.missingKey) {
         setMissingKey(true);
