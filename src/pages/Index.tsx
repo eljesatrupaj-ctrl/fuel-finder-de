@@ -51,16 +51,20 @@ export default function Index() {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const r = await fetchStations({ lat: loc.lat, lng: loc.lng, rad: radius, type: "all", sort });
+      // API erfordert bei sort=price einen konkreten Spritsorten-Typ
+      const apiType = sort === "price" ? (fuel === "all" ? "e5" : fuel) : "all";
+      const r = await fetchStations({ lat: loc.lat, lng: loc.lng, rad: radius, type: apiType, sort });
       if (cancelled) return;
       if (r.missingKey) {
         setMissingKey(true);
         setStations([]);
       } else if (r.stations) {
         setMissingKey(false);
+        // Wenn nach Preis sortiert wurde, lädt die API nur einen Spritpreis.
+        // Hole Details nicht – zeige nur den relevanten Preis und filtere null-Werte raus.
         setStations(r.stations);
       } else if (r.error) {
-        toast({ title: "Gabim API", description: r.error, variant: "destructive" });
+        toast({ title: "API-Fehler", description: r.error, variant: "destructive" });
       }
       setLoading(false);
     })();
