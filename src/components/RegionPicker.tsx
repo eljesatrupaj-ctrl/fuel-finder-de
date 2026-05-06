@@ -27,7 +27,7 @@ export default function RegionPicker({ onPick }: Props) {
           >
             <div>
               <div className="font-semibold">{b.name}</div>
-              <div className="text-xs text-muted-foreground">Kryeqyteti: {b.capital} · {b.cities.length} qytete</div>
+              <div className="text-xs text-muted-foreground">Hauptstadt: {b.capital} · {b.cities.length} Städte</div>
             </div>
             <motion.div animate={{ rotate: openId === b.id ? 90 : 0 }}>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />

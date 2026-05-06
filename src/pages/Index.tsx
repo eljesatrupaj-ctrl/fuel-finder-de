@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Fuel, Locate, Loader2, Search, AlertTriangle, MapPin } from "lucide-react";
+import { Fuel, Locate, Loader2, Search, AlertTriangle, MapPin, TrendingDown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -26,7 +26,7 @@ export default function Index() {
 
   const useGPS = () => {
     if (!navigator.geolocation) {
-      toast({ title: "GPS jo i disponueshëm", variant: "destructive" });
+      toast({ title: "GPS nicht verfügbar", variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -35,12 +35,12 @@ export default function Index() {
         setLoc({
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
-          label: "Lokacioni juaj",
+          label: "Mein Standort",
         });
       },
       (err) => {
         setLoading(false);
-        toast({ title: "GPS dështoi", description: err.message, variant: "destructive" });
+        toast({ title: "GPS fehlgeschlagen", description: err.message, variant: "destructive" });
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -51,7 +51,9 @@ export default function Index() {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const r = await fetchStations({ lat: loc.lat, lng: loc.lng, rad: radius, type: fuel, sort });
+      // Bei Sortierung nach Preis verlangt die API einen konkreten Spritsorten-Typ.
+      const apiType: FuelType = sort === "price" ? (fuel === "all" ? "e5" : fuel) : "all";
+      const r = await fetchStations({ lat: loc.lat, lng: loc.lng, rad: radius, type: apiType, sort });
       if (cancelled) return;
       if (r.missingKey) {
         setMissingKey(true);
@@ -60,7 +62,7 @@ export default function Index() {
         setMissingKey(false);
         setStations(r.stations);
       } else if (r.error) {
-        toast({ title: "Gabim API", description: r.error, variant: "destructive" });
+        toast({ title: "API-Fehler", description: r.error, variant: "destructive" });
       }
       setLoading(false);
     })();
@@ -71,38 +73,42 @@ export default function Index() {
 
   const cheapest = useMemo(() => {
     if (!stations.length) return null;
+    const key = fuel === "all" ? "e5" : fuel;
     const prices = stations
-      .map((s) => (fuel === "all" ? s.e5 : s[fuel as "e5" | "e10" | "diesel"]))
-      .filter((p): p is number => typeof p === "number");
+      .map((s) => s[key as "e5" | "e10" | "diesel"])
+      .filter((p): p is number => typeof p === "number" && p > 0);
     if (!prices.length) return null;
     return Math.min(...prices);
   }, [stations, fuel]);
 
+  const fuelLabel = fuel === "all" ? "Super E5" : fuel === "e5" ? "Super E5" : fuel === "e10" ? "Super E10" : "Diesel";
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* HEADER */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/75 backdrop-blur-xl">
         <div className="container mx-auto flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-primary shadow-glow">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl gradient-primary shadow-glow">
               <Fuel className="h-5 w-5 text-primary-foreground" />
+              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-secondary ring-2 ring-background animate-pulse" />
             </div>
             <div>
-              <h1 className="text-base font-bold leading-tight">TankFinder DE</h1>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Çmimet live · Gjermani</p>
+              <h1 className="text-base font-extrabold leading-tight tracking-tight">TankFinder<span className="text-primary">.DE</span></h1>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Live-Spritpreise</p>
             </div>
           </div>
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2 rounded-full border-border/80">
                 <Search className="h-4 w-4" />
-                Republikat
+                Bundesländer
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md">
               <SheetHeader>
                 <SheetTitle>Bundesländer</SheetTitle>
-                <SheetDescription>Zgjidh republikën dhe qytetin për të parë pompat e afërta</SheetDescription>
+                <SheetDescription>Wähle ein Bundesland und eine Stadt, um Tankstellen in der Nähe zu sehen.</SheetDescription>
               </SheetHeader>
               <div className="mt-4">
                 <RegionPicker
@@ -121,30 +127,39 @@ export default function Index() {
       {!loc && (
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 gradient-hero" />
-          <div className="relative container mx-auto flex flex-col items-center px-4 py-16 text-center sm:py-24">
+          <div className="absolute inset-0 opacity-[0.04] [background-image:linear-gradient(hsl(var(--foreground))_1px,transparent_1px),linear-gradient(90deg,hsl(var(--foreground))_1px,transparent_1px)] [background-size:48px_48px]" />
+          <div className="relative container mx-auto flex flex-col items-center px-4 py-20 text-center sm:py-28">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Über 16.000 Tankstellen · Echtzeit-Daten
+            </motion.div>
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
-              className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl gradient-primary shadow-elevated"
+              className="mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] gradient-primary shadow-elevated"
             >
-              <Fuel className="h-10 w-10 text-primary-foreground" />
+              <Fuel className="h-12 w-12 text-primary-foreground" />
             </motion.div>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="max-w-2xl text-4xl font-bold leading-tight sm:text-5xl"
+              className="max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl"
             >
-              Gjej <span className="text-gradient">çmimin më të lirë</span> të naftës rreth teje
+              Den <span className="text-gradient">günstigsten Sprit</span> in deiner Nähe finden
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="mt-4 max-w-lg text-base text-muted-foreground"
+              className="mt-5 max-w-lg text-base text-muted-foreground sm:text-lg"
             >
-              Çmime live nga Tankerkönig për mbi 16,000 pompa në Gjermani. Përdor GPS-in ose zgjidh manualisht qytetin.
+              Live-Preise für Super E5, E10 und Diesel von Tankerkönig. Per GPS oder manuell nach Bundesland & Stadt suchen.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -152,13 +167,13 @@ export default function Index() {
               transition={{ delay: 0.3 }}
               className="mt-8 flex flex-col gap-3 sm:flex-row"
             >
-              <Button onClick={useGPS} size="lg" className="gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+              <Button onClick={useGPS} size="lg" className="gradient-primary text-primary-foreground shadow-glow hover:opacity-90 rounded-full px-7">
                 <Locate className="mr-2 h-5 w-5" />
-                Përdor GPS-in tim
+                Standort verwenden
               </Button>
-              <Button onClick={() => setSheetOpen(true)} size="lg" variant="outline">
+              <Button onClick={() => setSheetOpen(true)} size="lg" variant="outline" className="rounded-full px-7">
                 <MapPin className="mr-2 h-5 w-5" />
-                Zgjidh qytetin
+                Stadt wählen
               </Button>
             </motion.div>
           </div>
@@ -176,16 +191,16 @@ export default function Index() {
                     <MapPin className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="text-xs uppercase tracking-wider text-muted-foreground">Po kërkohet rreth</div>
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Suche um</div>
                     <div className="font-semibold">{loc.label}</div>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={useGPS} size="sm" variant="outline">
+                  <Button onClick={useGPS} size="sm" variant="outline" className="rounded-full">
                     <Locate className="mr-1.5 h-4 w-4" /> GPS
                   </Button>
-                  <Button onClick={() => setSheetOpen(true)} size="sm" variant="outline">
-                    Ndrysho
+                  <Button onClick={() => setSheetOpen(true)} size="sm" variant="outline" className="rounded-full">
+                    Ändern
                   </Button>
                 </div>
               </div>
@@ -193,7 +208,7 @@ export default function Index() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <Tabs value={fuel} onValueChange={(v) => setFuel(v as FuelType)}>
                   <TabsList>
-                    <TabsTrigger value="all">Të gjitha</TabsTrigger>
+                    <TabsTrigger value="all">Alle</TabsTrigger>
                     <TabsTrigger value="e5">E5</TabsTrigger>
                     <TabsTrigger value="e10">E10</TabsTrigger>
                     <TabsTrigger value="diesel">Diesel</TabsTrigger>
@@ -201,17 +216,17 @@ export default function Index() {
                 </Tabs>
                 <Tabs value={sort} onValueChange={(v) => setSort(v as SortType)}>
                   <TabsList>
-                    <TabsTrigger value="dist">Më afër</TabsTrigger>
-                    <TabsTrigger value="price">Më lirë</TabsTrigger>
+                    <TabsTrigger value="dist">Nächste</TabsTrigger>
+                    <TabsTrigger value="price">Günstigste</TabsTrigger>
                   </TabsList>
                 </Tabs>
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Rreze:</span>
+                  <span className="text-muted-foreground">Umkreis:</span>
                   {[5, 10, 20, 25].map((r) => (
                     <button
                       key={r}
                       onClick={() => setRadius(r)}
-                      className={`rounded-md border px-2 py-1 text-xs transition ${
+                      className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
                         radius === r
                           ? "border-primary bg-primary/15 text-primary"
                           : "border-border text-muted-foreground hover:text-foreground"
@@ -226,15 +241,15 @@ export default function Index() {
           )}
 
           {missingKey && (
-            <div className="mx-auto max-w-2xl rounded-2xl border border-warning/40 bg-warning/5 p-6 text-center" style={{ borderColor: "hsl(var(--warning) / 0.4)", background: "hsl(var(--warning) / 0.05)" }}>
+            <div className="mx-auto max-w-2xl rounded-2xl border p-6 text-center" style={{ borderColor: "hsl(var(--warning) / 0.4)", background: "hsl(var(--warning) / 0.05)" }}>
               <AlertTriangle className="mx-auto mb-3 h-10 w-10" style={{ color: "hsl(var(--warning))" }} />
-              <h3 className="text-lg font-semibold">API Key i Tankerkönig mungon</h3>
+              <h3 className="text-lg font-semibold">Tankerkönig API-Key fehlt</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Kërko një key falas në{" "}
+                Kostenlosen Key bei{" "}
                 <a className="underline text-primary" href="https://creativecommons.tankerkoenig.de/" target="_blank" rel="noreferrer">
                   creativecommons.tankerkoenig.de
                 </a>{" "}
-                dhe dërgoma për ta shtuar në Cloud secrets si <code className="rounded bg-muted px-1">TANKERKOENIG_API_KEY</code>.
+                anfordern und als <code className="rounded bg-muted px-1">TANKERKOENIG_API_KEY</code> hinterlegen.
               </p>
             </div>
           )}
@@ -248,16 +263,17 @@ export default function Index() {
           {!loading && !missingKey && stations.length > 0 && (
             <>
               {cheapest != null && (
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-3 py-1 text-xs">
-                  <span className="font-semibold" style={{ color: "hsl(var(--secondary))" }}>
-                    Çmimi më i ulët: {cheapest.toFixed(3)} €
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-4 py-1.5 text-xs">
+                  <TrendingDown className="h-3.5 w-3.5" style={{ color: "hsl(var(--secondary))" }} />
+                  <span className="font-bold" style={{ color: "hsl(var(--secondary))" }}>
+                    Bester Preis ({fuelLabel}): {cheapest.toFixed(3)} €
                   </span>
-                  <span className="text-muted-foreground">· {stations.length} pompa</span>
+                  <span className="text-muted-foreground">· {stations.length} Tankstellen</span>
                 </div>
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {stations.map((s, i) => (
-                  <StationCard key={s.id} s={s} index={i} />
+                  <StationCard key={s.id} s={s} index={i} highlightFuel={fuel === "all" ? null : fuel} cheapest={cheapest} />
                 ))}
               </div>
             </>
@@ -265,7 +281,7 @@ export default function Index() {
 
           {!loading && !missingKey && loc && stations.length === 0 && (
             <div className="py-16 text-center text-muted-foreground">
-              S'u gjet asnjë pompë në këtë rreze.
+              Keine Tankstellen in diesem Umkreis gefunden.
             </div>
           )}
         </div>

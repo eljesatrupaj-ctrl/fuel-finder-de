@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { MapPin, Navigation, Clock } from "lucide-react";
+import { MapPin, Navigation, Clock, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { openInMaps, type Station } from "@/lib/tankerkoenig";
 
 const fmt = (v: number | null) =>
-  v == null ? "—" : v.toFixed(3).replace(/0$/, "") + " €";
+  v == null || v <= 0 ? "—" : v.toFixed(3).replace(/0$/, "") + " €";
 
 const brandColor = (brand: string) => {
   const b = (brand || "").toLowerCase();
@@ -15,35 +15,55 @@ const brandColor = (brand: string) => {
   if (b.includes("total")) return "bg-orange-500/15 text-orange-400 border-orange-500/30";
   if (b.includes("jet")) return "bg-pink-500/15 text-pink-400 border-pink-500/30";
   if (b.includes("hem")) return "bg-purple-500/15 text-purple-400 border-purple-500/30";
+  if (b.includes("sprint")) return "bg-emerald-500/15 text-emerald-400 border-emerald-500/30";
+  if (b.includes("elan")) return "bg-cyan-500/15 text-cyan-400 border-cyan-500/30";
   return "bg-muted text-muted-foreground border-border";
 };
 
-export default function StationCard({ s, index = 0 }: { s: Station; index?: number }) {
+type Key = "e5" | "e10" | "diesel";
+
+export default function StationCard({
+  s,
+  index = 0,
+  highlightFuel = null,
+  cheapest = null,
+}: {
+  s: Station;
+  index?: number;
+  highlightFuel?: Key | null;
+  cheapest?: number | null;
+}) {
+  const fuels: { label: string; key: Key; v: number | null; color: string }[] = [
+    { label: "E5", key: "e5", v: s.e5, color: "from-primary/25 to-primary/5" },
+    { label: "E10", key: "e10", v: s.e10, color: "from-secondary/25 to-secondary/5" },
+    { label: "Diesel", key: "diesel", v: s.diesel, color: "from-yellow-500/25 to-yellow-500/5" },
+  ];
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.4) }}
-      className="group relative overflow-hidden rounded-2xl border border-border gradient-card shadow-card transition-all hover:shadow-elevated hover:border-primary/40"
+      className="group relative overflow-hidden rounded-2xl border border-border gradient-card shadow-card transition-all hover:shadow-elevated hover:border-primary/40 hover:-translate-y-0.5"
     >
       <div className="absolute inset-x-0 top-0 h-1 gradient-fuel opacity-70" />
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className={`text-[10px] uppercase tracking-wider ${brandColor(s.brand)}`}>
                 {s.brand || "Tankstelle"}
               </Badge>
-              <span className={`flex items-center gap-1 text-[11px] ${s.isOpen ? "text-success" : "text-destructive"}`}
+              <span className="flex items-center gap-1 text-[11px]"
                 style={{ color: s.isOpen ? "hsl(var(--success))" : "hsl(var(--destructive))" }}>
                 <Clock className="h-3 w-3" />
-                {s.isOpen ? "Hapur" : "Mbyllur"}
+                {s.isOpen ? "Geöffnet" : "Geschlossen"}
               </span>
             </div>
             <h3 className="mt-1.5 truncate text-base font-semibold">{s.name}</h3>
             <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-              <MapPin className="h-3 w-3" />
-              {s.street} {s.houseNumber}, {s.postCode} {s.place}
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="truncate">{s.street} {s.houseNumber}, {s.postCode} {s.place}</span>
             </p>
           </div>
           <div className="shrink-0 rounded-xl bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
@@ -52,29 +72,37 @@ export default function StationCard({ s, index = 0 }: { s: Station; index?: numb
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
-          {[
-            { label: "E5", v: s.e5, color: "from-primary/20 to-primary/5" },
-            { label: "E10", v: s.e10, color: "from-secondary/20 to-secondary/5" },
-            { label: "Diesel", v: s.diesel, color: "from-yellow-500/20 to-yellow-500/5" },
-          ].map((f) => (
-            <div
-              key={f.label}
-              className={`rounded-xl border border-border bg-gradient-to-br ${f.color} p-2.5 text-center`}
-            >
-              <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                {f.label}
+          {fuels.map((f) => {
+            const isBest =
+              cheapest != null &&
+              highlightFuel === f.key &&
+              f.v != null &&
+              Math.abs(f.v - cheapest) < 0.0005;
+            return (
+              <div
+                key={f.label}
+                className={`relative rounded-xl border bg-gradient-to-br ${f.color} p-2.5 text-center ${
+                  isBest ? "border-secondary ring-2 ring-secondary/40" : "border-border"
+                }`}
+              >
+                {isBest && (
+                  <Flame className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-secondary p-0.5 text-secondary-foreground" />
+                )}
+                <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  {f.label}
+                </div>
+                <div className="mt-0.5 font-mono text-sm font-bold tabular-nums">{fmt(f.v)}</div>
               </div>
-              <div className="mt-0.5 font-mono text-sm font-bold">{fmt(f.v)}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <Button
           onClick={() => openInMaps(s)}
-          className="mt-4 w-full gradient-primary text-primary-foreground hover:opacity-90 shadow-glow"
+          className="mt-4 w-full gradient-primary text-primary-foreground hover:opacity-90 shadow-glow rounded-xl"
         >
           <Navigation className="mr-2 h-4 w-4" />
-          Udhëto te pompa
+          Route starten
         </Button>
       </div>
     </motion.article>
