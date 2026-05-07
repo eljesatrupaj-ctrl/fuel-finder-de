@@ -14,6 +14,7 @@ export type Station = {
   diesel: number | null;
   e5: number | null;
   e10: number | null;
+  price?: number | null;
   isOpen: boolean;
 };
 
@@ -34,6 +35,7 @@ export async function fetchStations(params: {
   type?: "all" | "diesel" | "e5" | "e10";
   sort?: "dist" | "price";
 }): Promise<ListResponse> {
+  const requestedType = params.type ?? "all";
   const { data: sess } = await supabase.auth.getSession();
   const token = sess.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
   const q = new URLSearchParams({
@@ -41,7 +43,7 @@ export async function fetchStations(params: {
     lat: String(params.lat),
     lng: String(params.lng),
     rad: String(params.rad ?? 10),
-    type: params.type ?? "all",
+    type: requestedType,
     sort: params.sort ?? "dist",
   });
   const res = await fetch(`${FN_URL}?${q.toString()}`, {
@@ -50,7 +52,19 @@ export async function fetchStations(params: {
       Authorization: `Bearer ${token}`,
     },
   });
-  return res.json();
+  const json = (await res.json()) as ListResponse;
+
+  if (Array.isArray(json.stations)) {
+    json.stations = json.stations.map((station) => {
+      const livePrice = typeof station.price === "number" && station.price > 0 ? station.price : null;
+      if (livePrice && requestedType !== "all") {
+        return { ...station, [requestedType]: station[requestedType] ?? livePrice };
+      }
+      return station;
+    });
+  }
+
+  return json;
 }
 
 export function openInMaps(s: { lat: number; lng: number; name: string }) {
