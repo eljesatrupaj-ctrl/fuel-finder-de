@@ -198,7 +198,9 @@ export default function Index() {
         <div className="container mx-auto px-4 py-6">
           {loc && (
             <div className="mb-5 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border gradient-card p-4 shadow-card">
+              <div className="relative overflow-hidden rounded-[1.35rem] border border-border/80 gradient-card p-4 shadow-card">
+                <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-primary/10 blur-2xl" />
+                <div className="relative flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
                     <MapPin className="h-5 w-5" />
@@ -216,6 +218,7 @@ export default function Index() {
                     Ändern
                   </Button>
                 </div>
+                </div>
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -227,12 +230,10 @@ export default function Index() {
                     <TabsTrigger value="diesel">Diesel</TabsTrigger>
                   </TabsList>
                 </Tabs>
-                <Tabs value={sort} onValueChange={(v) => setSort(v as SortType)}>
-                  <TabsList>
-                    <TabsTrigger value="dist">Nächste</TabsTrigger>
-                    <TabsTrigger value="price">Günstigste</TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/10 px-3 py-1.5 text-xs font-bold text-secondary">
+                  <TrendingDown className="h-3.5 w-3.5" />
+                  Günstigste oben
+                </div>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-muted-foreground">Umkreis:</span>
                   {[5, 10, 20, 25].map((r) => (
@@ -273,20 +274,28 @@ export default function Index() {
             </div>
           )}
 
-          {!loading && !missingKey && stations.length > 0 && (
+          {!loading && !missingKey && sortedStations.length > 0 && (
             <>
               {cheapest != null && (
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-4 py-1.5 text-xs">
-                  <TrendingDown className="h-3.5 w-3.5" style={{ color: "hsl(var(--secondary))" }} />
-                  <span className="font-bold" style={{ color: "hsl(var(--secondary))" }}>
-                    Bester Preis ({fuelLabel}): {cheapest.toFixed(3)} €
+                <div className="mb-4 inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-4 py-1.5 text-xs">
+                  <TrendingDown className="h-3.5 w-3.5 text-secondary" />
+                  <span className="font-bold text-secondary">
+                    Bester Preis ({fuelLabel}): {cheapest.toFixed(3).replace(".", ",")} €
                   </span>
-                  <span className="text-muted-foreground">· {stations.length} Tankstellen</span>
+                  <span className="text-muted-foreground">· {sortedStations.length} Tankstellen · günstig → teuer</span>
                 </div>
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {stations.map((s, i) => (
-                  <StationCard key={s.id} s={s} index={i} highlightFuel={fuel === "all" ? null : fuel} cheapest={cheapest} />
+                {sortedStations.map((s, i) => (
+                  <StationCard
+                    key={s.id}
+                    s={s}
+                    index={i}
+                    rank={i + 1}
+                    highlightFuel={selectedFuel}
+                    cheapest={cheapest}
+                    mostExpensive={mostExpensive}
+                  />
                 ))}
               </div>
             </>
