@@ -69,10 +69,17 @@ export default function Index() {
   }, [loc, radius, toast]);
 
   const sortedStations = useMemo(() => {
-    const priceFor = (s: Station) => s[selectedFuel] ?? Number.POSITIVE_INFINITY;
+    const priceFor = (s: Station) => {
+      const price = s[selectedFuel];
+      return typeof price === "number" && price > 0 ? price : Number.POSITIVE_INFINITY;
+    };
     return [...stations].sort((a, b) => {
-      const priceDiff = priceFor(a) - priceFor(b);
-      if (Number.isFinite(priceDiff) && Math.abs(priceDiff) > 0.0005) return priceDiff;
+      const aPrice = priceFor(a);
+      const bPrice = priceFor(b);
+      if (Number.isFinite(aPrice) && !Number.isFinite(bPrice)) return -1;
+      if (!Number.isFinite(aPrice) && Number.isFinite(bPrice)) return 1;
+      const priceDiff = aPrice - bPrice;
+      if (Math.abs(priceDiff) > 0.0005) return priceDiff;
       return a.dist - b.dist;
     });
   }, [stations, selectedFuel]);
