@@ -47,7 +47,14 @@ export default function AdBanner() {
     };
   }, []);
 
-  if (isNative) return <div className="h-20 shrink-0" aria-hidden />;
+  if (isNative)
+    return (
+      <div
+        className="shrink-0"
+        style={{ height: "calc(96px + env(safe-area-inset-bottom, 0px))" }}
+        aria-hidden
+      />
+    );
 
   return (
     <footer className="w-full shrink-0 border-t border-border/70 bg-background/95 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-xl">
