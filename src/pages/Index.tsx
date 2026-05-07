@@ -11,7 +11,6 @@ import AdBanner from "@/components/AdBanner";
 import { fetchStations, type Station } from "@/lib/tankerkoenig";
 
 type FuelType = "all" | "e5" | "e10" | "diesel";
-type SortType = "dist" | "price";
 
 export default function Index() {
   const { toast } = useToast();
@@ -20,9 +19,9 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [missingKey, setMissingKey] = useState(false);
   const [fuel, setFuel] = useState<FuelType>("all");
-  const [sort, setSort] = useState<SortType>("dist");
   const [radius, setRadius] = useState(10);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const selectedFuel = fuel === "all" ? "e5" : fuel;
 
   const useGPS = () => {
     if (!navigator.geolocation) {
@@ -51,9 +50,7 @@ export default function Index() {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      // Bei Sortierung nach Preis verlangt die API einen konkreten Spritsorten-Typ.
-      const apiType: FuelType = sort === "price" ? (fuel === "all" ? "e5" : fuel) : "all";
-      const r = await fetchStations({ lat: loc.lat, lng: loc.lng, rad: radius, type: apiType, sort });
+      const r = await fetchStations({ lat: loc.lat, lng: loc.lng, rad: radius, type: "all", sort: "dist" });
       if (cancelled) return;
       if (r.missingKey) {
         setMissingKey(true);
@@ -69,17 +66,33 @@ export default function Index() {
     return () => {
       cancelled = true;
     };
-  }, [loc, fuel, sort, radius, toast]);
+  }, [loc, radius, toast]);
+
+  const sortedStations = useMemo(() => {
+    const priceFor = (s: Station) => s[selectedFuel] ?? Number.POSITIVE_INFINITY;
+    return [...stations].sort((a, b) => {
+      const priceDiff = priceFor(a) - priceFor(b);
+      if (Number.isFinite(priceDiff) && Math.abs(priceDiff) > 0.0005) return priceDiff;
+      return a.dist - b.dist;
+    });
+  }, [stations, selectedFuel]);
 
   const cheapest = useMemo(() => {
-    if (!stations.length) return null;
-    const key = fuel === "all" ? "e5" : fuel;
-    const prices = stations
-      .map((s) => s[key as "e5" | "e10" | "diesel"])
+    if (!sortedStations.length) return null;
+    const prices = sortedStations
+      .map((s) => s[selectedFuel])
       .filter((p): p is number => typeof p === "number" && p > 0);
     if (!prices.length) return null;
     return Math.min(...prices);
-  }, [stations, fuel]);
+  }, [sortedStations, selectedFuel]);
+
+  const mostExpensive = useMemo(() => {
+    const prices = sortedStations
+      .map((s) => s[selectedFuel])
+      .filter((p): p is number => typeof p === "number" && p > 0);
+    if (!prices.length) return null;
+    return Math.max(...prices);
+  }, [sortedStations, selectedFuel]);
 
   const fuelLabel = fuel === "all" ? "Super E5" : fuel === "e5" ? "Super E5" : fuel === "e10" ? "Super E10" : "Diesel";
 
