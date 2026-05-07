@@ -30,9 +30,10 @@ export default function AdBanner() {
           adSize: BannerAdSize.ADAPTIVE_BANNER,
           position: BannerAdPosition.BOTTOM_CENTER,
           margin: 0,
+          isTesting: true,
         });
       } catch (e) {
-        console.warn("AdMob jo i disponueshëm:", e);
+        console.warn("AdMob nicht verfügbar:", e);
       }
     })();
     return () => {
@@ -46,15 +47,15 @@ export default function AdBanner() {
     };
   }, []);
 
-  if (isNative) return <div className="h-14" aria-hidden />;
+  if (isNative) return <div className="h-20 shrink-0" aria-hidden />;
 
   return (
-    <div className="w-full border-t border-border bg-card/60 backdrop-blur-md">
-      <div className="container mx-auto flex h-14 items-center justify-center px-4">
-        <div className="flex h-full w-full max-w-[728px] items-center justify-center rounded-md border border-dashed border-border bg-muted/40 text-xs text-muted-foreground">
-          <span className="font-medium tracking-wider uppercase">Reklamë · AdMob Banner</span>
+    <footer className="w-full shrink-0 border-t border-border/70 bg-background/95 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-xl">
+      <div className="container mx-auto flex min-h-16 items-center justify-center px-4">
+        <div className="flex h-14 w-full max-w-[728px] items-center justify-center rounded-xl border border-dashed border-border/90 bg-card/75 text-xs text-muted-foreground shadow-card">
+          <span className="font-medium tracking-wider uppercase">Anzeige · AdMob Test Banner</span>
         </div>
       </div>
-    </div>
+    </footer>
   );
 }
