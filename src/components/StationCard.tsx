@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { MapPin, Navigation, Clock, Flame } from "lucide-react";
+import { MapPin, Navigation, Clock, Flame, TrendingDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { openInMaps, type Station } from "@/lib/tankerkoenig";
 
 const fmt = (v: number | null) =>
-  v == null || v <= 0 ? "—" : v.toFixed(3).replace(/0$/, "") + " €";
+  v == null || v <= 0 ? "—" : v.toFixed(3).replace(".", ",") + " €";
 
 const brandColor = (brand: string) => {
   const b = (brand || "").toLowerCase();
@@ -27,11 +27,15 @@ export default function StationCard({
   index = 0,
   highlightFuel = null,
   cheapest = null,
+  rank = null,
+  mostExpensive = null,
 }: {
   s: Station;
   index?: number;
   highlightFuel?: Key | null;
   cheapest?: number | null;
+  rank?: number | null;
+  mostExpensive?: number | null;
 }) {
   const fuels: { label: string; key: Key; v: number | null; color: string }[] = [
     { label: "E5", key: "e5", v: s.e5, color: "from-primary/25 to-primary/5" },
@@ -44,9 +48,10 @@ export default function StationCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.4) }}
-      className="group relative overflow-hidden rounded-2xl border border-border gradient-card shadow-card transition-all hover:shadow-elevated hover:border-primary/40 hover:-translate-y-0.5"
+      className="group relative overflow-hidden rounded-[1.35rem] border border-border/80 gradient-card shadow-card transition-all hover:shadow-elevated hover:border-primary/45 hover:-translate-y-0.5"
     >
-      <div className="absolute inset-x-0 top-0 h-1 gradient-fuel opacity-70" />
+      <div className="absolute inset-x-0 top-0 h-1 gradient-fuel opacity-80" />
+      <div className="absolute -right-12 -top-12 h-28 w-28 rounded-full bg-primary/10 blur-2xl" />
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -66,8 +71,15 @@ export default function StationCard({
               <span className="truncate">{s.street} {s.houseNumber}, {s.postCode} {s.place}</span>
             </p>
           </div>
-          <div className="shrink-0 rounded-xl bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
-            {s.dist.toFixed(1)} km
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            {rank != null && (
+              <div className="rounded-full border border-secondary/35 bg-secondary/12 px-2.5 py-1 text-[11px] font-extrabold text-secondary">
+                #{rank}
+              </div>
+            )}
+            <div className="rounded-xl bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+              {s.dist.toFixed(1)} km
+            </div>
           </div>
         </div>
 
@@ -81,7 +93,7 @@ export default function StationCard({
             return (
               <div
                 key={f.label}
-                className={`relative rounded-xl border bg-gradient-to-br ${f.color} p-2.5 text-center ${
+                className={`relative min-h-[70px] rounded-xl border bg-gradient-to-br ${f.color} p-2.5 text-center ${
                   isBest ? "border-secondary ring-2 ring-secondary/40" : "border-border"
                 }`}
               >
@@ -92,6 +104,12 @@ export default function StationCard({
                   {f.label}
                 </div>
                 <div className="mt-0.5 font-mono text-sm font-bold tabular-nums">{fmt(f.v)}</div>
+                {highlightFuel === f.key && f.v != null && f.v > 0 && (
+                  <div className="mt-1 flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
+                    {isBest ? <TrendingDown className="h-3 w-3 text-secondary" /> : f.v === mostExpensive ? <TrendingUp className="h-3 w-3 text-destructive" /> : null}
+                    <span>{isBest ? "Bestpreis" : f.v === mostExpensive ? "Teuer" : "Live"}</span>
+                  </div>
+                )}
               </div>
             );
           })}
