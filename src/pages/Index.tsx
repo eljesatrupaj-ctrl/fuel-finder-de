@@ -132,48 +132,41 @@ export default function Index() {
   const fuelLabel = fuel === "all" ? "Super E5" : fuel === "e5" ? "Super E5" : fuel === "e10" ? "Super E10" : "Diesel";
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div
+      className="flex min-h-screen flex-col"
+      style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+    >
       {/* HEADER */}
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/75 backdrop-blur-xl">
+      <header className="sticky z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl"
+        style={{ top: "env(safe-area-inset-top, 0px)" }}
+      >
         <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-3">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             {loc && (
               <Button
                 onClick={() => { persistLoc(null); try { localStorage.removeItem(STORAGE_KEY); } catch {} setOnboardingOpen(true); }}
                 size="icon"
                 variant="ghost"
-                className="h-9 w-9 rounded-full"
+                className="h-9 w-9 shrink-0 rounded-full"
                 aria-label="Zurück"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             )}
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl gradient-primary shadow-glow">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl gradient-primary shadow-glow">
               <Fuel className="h-5 w-5 text-primary-foreground" />
               <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-secondary ring-2 ring-background animate-pulse" />
             </div>
-            <div>
-              <h1 className="text-base font-extrabold leading-tight tracking-tight">TankFinder</h1>
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-extrabold leading-tight tracking-tight">TankFinder</h1>
               <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Live-Spritpreise</p>
             </div>
           </div>
-        </div>
-        {/* Search Bundesland row — slightly lower */}
-        <div className="container mx-auto px-4 pb-3">
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                className="group relative w-full justify-start gap-3 rounded-2xl border-border/80 bg-card/60 px-4 py-6 text-left shadow-card hover:border-primary/50 hover:bg-card"
-              >
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-primary text-primary-foreground shadow-glow">
-                  <Search className="h-4 w-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Suche</div>
-                  <div className="font-semibold truncate">Bundesland & Stadt wählen</div>
-                </div>
-                <Sparkles className="h-4 w-4 text-primary opacity-70 group-hover:opacity-100" />
+              <Button variant="outline" size="sm" className="shrink-0 gap-2 rounded-full border-border/80">
+                <Search className="h-4 w-4" />
+                <span className="hidden sm:inline">Bundesländer</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(110px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
@@ -371,13 +364,9 @@ export default function Index() {
       <OnboardingDialog
         open={onboardingOpen}
         onOpenChange={setOnboardingOpen}
-        onPick={(p) => {
+        onConfirm={(p) => {
           persistLoc(p);
           setOnboardingOpen(false);
-        }}
-        onUseGPS={() => {
-          setOnboardingOpen(false);
-          useGPS();
         }}
       />
     </div>
