@@ -18,14 +18,38 @@ type FuelType = "all" | "e5" | "e10" | "diesel";
 
 export default function Index() {
   const { toast } = useToast();
-  const [loc, setLoc] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const [loc, setLoc] = useState<{ lat: number; lng: number; label: string } | null>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(false);
   const [missingKey, setMissingKey] = useState(false);
   const [fuel, setFuel] = useState<FuelType>("all");
   const [radius, setRadius] = useState(10);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(() => {
+    try {
+      return !localStorage.getItem(ONBOARDED_KEY) && !localStorage.getItem(STORAGE_KEY);
+    } catch {
+      return true;
+    }
+  });
   const selectedFuel = fuel === "all" ? "e5" : fuel;
+
+  const persistLoc = (l: { lat: number; lng: number; label: string } | null) => {
+    setLoc(l);
+    try {
+      if (l) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(l));
+        localStorage.setItem(ONBOARDED_KEY, "1");
+      }
+    } catch {}
+  };
 
   const useGPS = () => {
     if (!navigator.geolocation) {
