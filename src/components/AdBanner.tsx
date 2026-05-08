@@ -47,21 +47,20 @@ export default function AdBanner() {
     };
   }, []);
 
-  if (isNative)
-    return (
-      <div
-        className="shrink-0"
-        style={{ height: "calc(96px + env(safe-area-inset-bottom, 0px))" }}
-        aria-hidden
-      />
-    );
+  if (isNative) return null;
 
   return (
-    <footer className="w-full shrink-0 border-t border-border/70 bg-background/95 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-xl">
-      <div className="container mx-auto flex min-h-16 items-center justify-center px-4">
+    <footer
+      className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-border/70 bg-background/95 backdrop-blur-xl"
+      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)", paddingTop: "0.5rem" }}
+    >
+      <div className="container mx-auto flex flex-col items-center gap-1 px-4">
         <div className="flex h-14 w-full max-w-[728px] items-center justify-center rounded-xl border border-dashed border-border/90 bg-card/75 text-xs text-muted-foreground shadow-card">
           <span className="font-medium tracking-wider uppercase">Anzeige · AdMob Test Banner</span>
         </div>
+        <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
+          Erstellt von <span className="font-semibold text-foreground/80">DS Interactive</span>
+        </p>
       </div>
     </footer>
   );
