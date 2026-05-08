@@ -139,7 +139,7 @@ export default function Index() {
           <div className="flex items-center gap-2.5">
             {loc && (
               <Button
-                onClick={() => setLoc(null)}
+                onClick={() => { persistLoc(null); try { localStorage.removeItem(STORAGE_KEY); } catch {} setOnboardingOpen(true); }}
                 size="icon"
                 variant="ghost"
                 className="h-9 w-9 rounded-full"
