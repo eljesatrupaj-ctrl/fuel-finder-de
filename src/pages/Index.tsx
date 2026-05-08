@@ -148,7 +148,7 @@ export default function Index() {
                 <Sparkles className="h-4 w-4 text-primary opacity-70 group-hover:opacity-100" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md">
+            <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(110px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
               <SheetHeader>
                 <SheetTitle>Bundesländer</SheetTitle>
                 <SheetDescription>Wähle ein Bundesland und eine Stadt, um Tankstellen in der Nähe zu sehen.</SheetDescription>
