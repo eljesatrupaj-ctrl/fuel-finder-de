@@ -224,7 +224,7 @@ export default function Index() {
       )}
 
       {/* MAIN */}
-      <main className="flex-1">
+      <main className="flex-1 pb-[calc(96px+env(safe-area-inset-bottom,0px))]">
         <div className="container mx-auto px-4 py-6">
           {loc && (
             <div className="mb-5 space-y-4">
