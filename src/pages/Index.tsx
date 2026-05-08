@@ -8,20 +8,48 @@ import { useToast } from "@/hooks/use-toast";
 import RegionPicker from "@/components/RegionPicker";
 import StationCard from "@/components/StationCard";
 import AdBanner from "@/components/AdBanner";
+import OnboardingDialog from "@/components/OnboardingDialog";
 import { fetchStations, type Station } from "@/lib/tankerkoenig";
+
+const STORAGE_KEY = "tankfinder.lastLocation";
+const ONBOARDED_KEY = "tankfinder.onboarded";
 
 type FuelType = "all" | "e5" | "e10" | "diesel";
 
 export default function Index() {
   const { toast } = useToast();
-  const [loc, setLoc] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const [loc, setLoc] = useState<{ lat: number; lng: number; label: string } | null>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(false);
   const [missingKey, setMissingKey] = useState(false);
   const [fuel, setFuel] = useState<FuelType>("all");
   const [radius, setRadius] = useState(10);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(() => {
+    try {
+      return !localStorage.getItem(ONBOARDED_KEY) && !localStorage.getItem(STORAGE_KEY);
+    } catch {
+      return true;
+    }
+  });
   const selectedFuel = fuel === "all" ? "e5" : fuel;
+
+  const persistLoc = (l: { lat: number; lng: number; label: string } | null) => {
+    setLoc(l);
+    try {
+      if (l) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(l));
+        localStorage.setItem(ONBOARDED_KEY, "1");
+      }
+    } catch {}
+  };
 
   const useGPS = () => {
     if (!navigator.geolocation) {
@@ -31,7 +59,7 @@ export default function Index() {
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setLoc({
+        persistLoc({
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
           label: "Mein Standort",
@@ -111,7 +139,7 @@ export default function Index() {
           <div className="flex items-center gap-2.5">
             {loc && (
               <Button
-                onClick={() => setLoc(null)}
+                onClick={() => { persistLoc(null); try { localStorage.removeItem(STORAGE_KEY); } catch {} setOnboardingOpen(true); }}
                 size="icon"
                 variant="ghost"
                 className="h-9 w-9 rounded-full"
@@ -156,7 +184,7 @@ export default function Index() {
               <div className="mt-4">
                 <RegionPicker
                   onPick={(p) => {
-                    setLoc(p);
+                    persistLoc(p);
                     setSheetOpen(false);
                   }}
                 />
@@ -340,6 +368,18 @@ export default function Index() {
       </main>
 
       <AdBanner />
+      <OnboardingDialog
+        open={onboardingOpen}
+        onOpenChange={setOnboardingOpen}
+        onPick={(p) => {
+          persistLoc(p);
+          setOnboardingOpen(false);
+        }}
+        onUseGPS={() => {
+          setOnboardingOpen(false);
+          useGPS();
+        }}
+      />
     </div>
   );
 }
