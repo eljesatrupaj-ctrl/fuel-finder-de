@@ -364,13 +364,9 @@ export default function Index() {
       <OnboardingDialog
         open={onboardingOpen}
         onOpenChange={setOnboardingOpen}
-        onPick={(p) => {
+        onConfirm={(p) => {
           persistLoc(p);
           setOnboardingOpen(false);
-        }}
-        onUseGPS={() => {
-          setOnboardingOpen(false);
-          useGPS();
         }}
       />
     </div>
