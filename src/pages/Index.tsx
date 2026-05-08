@@ -184,7 +184,7 @@ export default function Index() {
               <div className="mt-4">
                 <RegionPicker
                   onPick={(p) => {
-                    setLoc(p);
+                    persistLoc(p);
                     setSheetOpen(false);
                   }}
                 />
