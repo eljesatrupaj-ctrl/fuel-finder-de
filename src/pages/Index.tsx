@@ -8,7 +8,11 @@ import { useToast } from "@/hooks/use-toast";
 import RegionPicker from "@/components/RegionPicker";
 import StationCard from "@/components/StationCard";
 import AdBanner from "@/components/AdBanner";
+import OnboardingDialog from "@/components/OnboardingDialog";
 import { fetchStations, type Station } from "@/lib/tankerkoenig";
+
+const STORAGE_KEY = "tankfinder.lastLocation";
+const ONBOARDED_KEY = "tankfinder.onboarded";
 
 type FuelType = "all" | "e5" | "e10" | "diesel";
 
