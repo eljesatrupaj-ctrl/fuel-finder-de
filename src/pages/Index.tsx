@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Fuel, Locate, Loader2, Search, AlertTriangle, MapPin, TrendingDown, Sparkles } from "lucide-react";
+import { Fuel, Locate, Loader2, Search, AlertTriangle, MapPin, TrendingDown, Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
