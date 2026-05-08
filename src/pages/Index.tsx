@@ -59,7 +59,7 @@ export default function Index() {
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setLoc({
+        persistLoc({
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
           label: "Mein Standort",
