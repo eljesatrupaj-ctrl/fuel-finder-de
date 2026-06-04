@@ -9,6 +9,7 @@ import RegionPicker from "@/components/RegionPicker";
 import StationCard from "@/components/StationCard";
 import AdBanner from "@/components/AdBanner";
 import OnboardingDialog from "@/components/OnboardingDialog";
+import SettingsMenu from "@/components/SettingsMenu";
 import { fetchStations, type Station } from "@/lib/tankerkoenig";
 
 const STORAGE_KEY = "tankfinder.lastLocation";
@@ -162,28 +163,31 @@ export default function Index() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Live-Spritpreise</p>
             </div>
           </div>
-          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="shrink-0 gap-2 rounded-full border-border/80">
-                <Search className="h-4 w-4" />
-                <span className="hidden sm:inline">Bundesländer</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(110px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
-              <SheetHeader>
-                <SheetTitle>Bundesländer</SheetTitle>
-                <SheetDescription>Wähle ein Bundesland und eine Stadt, um Tankstellen in der Nähe zu sehen.</SheetDescription>
-              </SheetHeader>
-              <div className="mt-4">
-                <RegionPicker
-                  onPick={(p) => {
-                    persistLoc(p);
-                    setSheetOpen(false);
-                  }}
-                />
-              </div>
-            </SheetContent>
-          </Sheet>
+          <div className="flex items-center gap-1.5">
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="shrink-0 gap-2 rounded-full border-border/80">
+                  <Search className="h-4 w-4" />
+                  <span className="hidden sm:inline">Bundesländer</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(110px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
+                <SheetHeader>
+                  <SheetTitle>Bundesländer</SheetTitle>
+                  <SheetDescription>Wähle ein Bundesland und eine Stadt, um Tankstellen in der Nähe zu sehen.</SheetDescription>
+                </SheetHeader>
+                <div className="mt-4">
+                  <RegionPicker
+                    onPick={(p) => {
+                      persistLoc(p);
+                      setSheetOpen(false);
+                    }}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+            <SettingsMenu />
+          </div>
         </div>
       </header>
 

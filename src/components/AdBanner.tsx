@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
+
+const ADMOB_BANNER_ID = "ca-app-pub-1262030761712683/8736767962";
 
 /**
- * Vendi për banerin AdMob.
- * - Në web: shfaq një placeholder modern (AdMob nuk shfaqet në browser).
- * - Në native (Capacitor Android/iOS): inicializon AdMob dhe shfaq banerin real në fund të ekranit.
- *
- * Për të aktivizuar AdMob në build mobile:
- *  1. Eksporto në GitHub
- *  2. npm i && npx cap add android
- *  3. Konfiguro App ID tënd në capacitor.config.ts (tani është test ID i Google)
- *  4. npx cap sync && npx cap run android
+ * Banneri AdMob.
+ * - Native (Capacitor): shfaq banerin real në fund të ekranit.
+ * - Web: shfaq një placeholder premium.
  */
 export default function AdBanner() {
   const [isNative, setIsNative] = useState(false);
@@ -24,13 +21,13 @@ export default function AdBanner() {
         setIsNative(true);
 
         const { AdMob, BannerAdPosition, BannerAdSize } = await import("@capacitor-community/admob");
-        await AdMob.initialize({ initializeForTesting: true });
+        await AdMob.initialize({ initializeForTesting: false });
         await AdMob.showBanner({
-          adId: "ca-app-pub-3940256099942544/6300978111", // Google test banner
+          adId: ADMOB_BANNER_ID,
           adSize: BannerAdSize.ADAPTIVE_BANNER,
           position: BannerAdPosition.BOTTOM_CENTER,
           margin: 0,
-          isTesting: true,
+          isTesting: false,
         });
       } catch (e) {
         console.warn("AdMob nicht verfügbar:", e);
@@ -51,15 +48,20 @@ export default function AdBanner() {
 
   return (
     <footer
-      className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-border/70 bg-background/95 backdrop-blur-xl"
+      className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-border/60 bg-background/90 backdrop-blur-2xl"
       style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)", paddingTop: "0.5rem" }}
     >
-      <div className="container mx-auto flex flex-col items-center gap-1 px-4">
-        <div className="flex h-14 w-full max-w-[728px] items-center justify-center rounded-xl border border-dashed border-border/90 bg-card/75 text-xs text-muted-foreground shadow-card">
-          <span className="font-medium tracking-wider uppercase">Anzeige · AdMob Test Banner</span>
+      <div className="container mx-auto flex flex-col items-center gap-1.5 px-4">
+        <div className="relative flex h-14 w-full max-w-[728px] items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-card via-card/80 to-card shadow-card">
+          <div className="absolute inset-0 opacity-30 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10" />
+          <div className="relative flex items-center gap-2 text-xs text-muted-foreground">
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            <span className="font-semibold tracking-widest uppercase">Anzeige</span>
+            <span className="opacity-60">· AdMob</span>
+          </div>
         </div>
-        <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
-          Erstellt von <span className="font-semibold text-foreground/80">DS Interactive</span>
+        <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70">
+          Krijuar nga <span className="font-semibold text-foreground/80">DS Interactive</span>
         </p>
       </div>
     </footer>
