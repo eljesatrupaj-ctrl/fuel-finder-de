@@ -9,6 +9,7 @@ import RegionPicker from "@/components/RegionPicker";
 import StationCard from "@/components/StationCard";
 import AdBanner from "@/components/AdBanner";
 import OnboardingDialog from "@/components/OnboardingDialog";
+import SettingsMenu from "@/components/SettingsMenu";
 import { fetchStations, type Station } from "@/lib/tankerkoenig";
 
 const STORAGE_KEY = "tankfinder.lastLocation";
