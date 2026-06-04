@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings, Share2, Star, Shield, Sparkles, ExternalLink, Heart, Copy, Check } from "lucide-react";
+import { Settings, Share2, Star, Shield, Sparkles, ExternalLink, Heart, Copy, Check, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -19,8 +19,36 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.tankfinder.de";
+const PLAY_STORE_REVIEW_URL =
+  "https://play.google.com/store/apps/details?id=com.tankfinder.de&showAllReviews=true";
 const SHARE_TEXT =
   "TankFinder DE — finde die günstigsten Spritpreise in deiner Nähe! Live-Daten für E5, E10 & Diesel.";
+
+// Externen Link robust öffnen (Web, PWA, Capacitor WebView)
+async function openExternal(url: string) {
+  try {
+    const { Capacitor } = await import("@capacitor/core");
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const { Browser } = await import("@capacitor/browser");
+        await Browser.open({ url });
+        return;
+      } catch {
+        // Fallback: versuche market:// für Play-Store
+        if (url.includes("play.google.com")) {
+          const id = "com.tankfinder.de";
+          window.location.href = `market://details?id=${id}`;
+          return;
+        }
+      }
+    }
+  } catch {}
+  const win = window.open(url, "_blank", "noopener,noreferrer");
+  if (!win) {
+    // Letzter Fallback
+    window.location.href = url;
+  }
+}
 
 export default function SettingsMenu() {
   const { toast } = useToast();
@@ -32,13 +60,23 @@ export default function SettingsMenu() {
   const shareApp = async () => {
     const data = { title: "TankFinder DE", text: SHARE_TEXT, url: PLAY_STORE_URL };
     try {
-      if (navigator.share) {
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
         await navigator.share(data);
-      } else {
-        await navigator.clipboard.writeText(`${SHARE_TEXT}\n${PLAY_STORE_URL}`);
-        toast({ title: "Link kopiert", description: "App-Link in die Zwischenablage kopiert." });
+        return;
       }
-    } catch {}
+    } catch (err: any) {
+      // User-Abbruch ignorieren
+      if (err?.name === "AbortError") return;
+    }
+    // Fallback: Clipboard
+    try {
+      await navigator.clipboard.writeText(`${SHARE_TEXT}\n${PLAY_STORE_URL}`);
+      toast({ title: "Link kopiert ✨", description: "App-Link wurde in die Zwischenablage kopiert." });
+    } catch {
+      // Letzter Fallback: Share-Seite öffnen
+      const u = `mailto:?subject=${encodeURIComponent("TankFinder DE")}&body=${encodeURIComponent(`${SHARE_TEXT}\n${PLAY_STORE_URL}`)}`;
+      openExternal(u);
+    }
   };
 
   const copyLink = async () => {
@@ -46,7 +84,9 @@ export default function SettingsMenu() {
       await navigator.clipboard.writeText(PLAY_STORE_URL);
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
-    } catch {}
+    } catch {
+      toast({ title: "Kopieren nicht möglich", variant: "destructive" });
+    }
   };
 
   const items = [
@@ -55,21 +95,21 @@ export default function SettingsMenu() {
       title: "App bewerten",
       desc: "Hilf uns mit 5 Sternen im Play Store",
       onClick: () => setRateOpen(true),
-      accent: "from-yellow-500/20 to-amber-500/5 text-yellow-400 border-yellow-500/30",
+      accent: "from-primary/25 to-primary/5 text-primary border-primary/35",
     },
     {
       icon: Share2,
       title: "App teilen",
       desc: "Empfehle TankFinder deinen Freunden",
       onClick: shareApp,
-      accent: "from-primary/25 to-primary/5 text-primary border-primary/30",
+      accent: "from-secondary/25 to-secondary/5 text-secondary border-secondary/35",
     },
     {
       icon: Shield,
       title: "Datenschutz",
       desc: "Datenschutzerklärung & Hinweise",
       onClick: () => setPrivacyOpen(true),
-      accent: "from-secondary/25 to-secondary/5 text-secondary border-secondary/30",
+      accent: "from-muted/40 to-muted/10 text-foreground border-border",
     },
   ];
 
@@ -80,7 +120,7 @@ export default function SettingsMenu() {
           <Button
             size="icon"
             variant="ghost"
-            className="h-9 w-9 shrink-0 rounded-full"
+            className="h-9 w-9 shrink-0 rounded-full hover:bg-primary/15 hover:text-primary"
             aria-label="Einstellungen"
           >
             <Settings className="h-5 w-5" />
@@ -91,7 +131,12 @@ export default function SettingsMenu() {
           className="w-full overflow-y-auto pb-[calc(110px+env(safe-area-inset-bottom,0px))] sm:max-w-md"
         >
           <SheetHeader className="text-left">
-            <SheetTitle className="text-2xl font-extrabold tracking-tight">Einstellungen</SheetTitle>
+            <div className="mb-2 inline-flex items-center gap-2 self-start rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+              <Sparkles className="h-3 w-3" /> Premium
+            </div>
+            <SheetTitle className="text-2xl font-extrabold tracking-tight">
+              <span className="text-gold">Einstellungen</span>
+            </SheetTitle>
             <SheetDescription>Verwalte deine App-Optionen.</SheetDescription>
           </SheetHeader>
 
@@ -105,7 +150,7 @@ export default function SettingsMenu() {
                 }}
                 className={`group flex w-full items-center gap-3 rounded-2xl border bg-gradient-to-br ${it.accent} p-4 text-left transition hover:scale-[1.01] hover:shadow-card`}
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-background/40 backdrop-blur">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-background/50 backdrop-blur">
                   <it.icon className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -117,14 +162,14 @@ export default function SettingsMenu() {
             ))}
           </div>
 
-          <div className="mt-8 rounded-2xl border border-border/70 bg-card/60 p-4 text-center">
-            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl gradient-primary shadow-glow">
+          <div className="mt-8 rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card p-5 text-center shadow-card">
+            <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-xl gradient-gold shadow-glow">
               <Sparkles className="h-5 w-5 text-primary-foreground" />
             </div>
-            <div className="text-sm font-semibold">TankFinder DE</div>
+            <div className="text-sm font-bold">TankFinder DE</div>
             <div className="text-[11px] text-muted-foreground">Version 1.0 · Live-Spritpreise</div>
             <div className="mt-3 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/80">
-              Krijuar nga <span className="font-semibold text-foreground/90">DS Interactive</span>
+              Krijuar nga <span className="font-semibold text-primary">DS Interactive</span>
             </div>
           </div>
         </SheetContent>
@@ -135,7 +180,7 @@ export default function SettingsMenu() {
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
-              <Shield className="h-5 w-5 text-secondary" />
+              <Shield className="h-5 w-5 text-primary" />
               Datenschutzerklärung
             </DialogTitle>
             <DialogDescription>Stand: Juni 2026</DialogDescription>
@@ -158,9 +203,12 @@ export default function SettingsMenu() {
               <h4 className="mb-1 font-semibold text-foreground">2. Tankstellendaten</h4>
               <p>
                 Live-Spritpreise werden über die offizielle Schnittstelle{" "}
-                <a className="text-primary underline" href="https://creativecommons.tankerkoenig.de/" target="_blank" rel="noreferrer">
+                <button
+                  className="text-primary underline"
+                  onClick={() => openExternal("https://creativecommons.tankerkoenig.de/")}
+                >
                   Tankerkönig
-                </a>{" "}
+                </button>{" "}
                 bezogen.
               </p>
             </div>
@@ -169,9 +217,12 @@ export default function SettingsMenu() {
               <p>
                 Die App zeigt Werbeanzeigen über Google AdMob an. Google kann dabei Geräte- und
                 Nutzungsdaten gemäß seiner{" "}
-                <a className="text-primary underline" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">
+                <button
+                  className="text-primary underline"
+                  onClick={() => openExternal("https://policies.google.com/privacy")}
+                >
                   Datenschutzerklärung
-                </a>{" "}
+                </button>{" "}
                 verarbeiten.
               </p>
             </div>
@@ -198,13 +249,13 @@ export default function SettingsMenu() {
           <div className="relative overflow-hidden">
             <div className="absolute inset-0 gradient-hero" />
             <div className="relative px-6 pt-8 pb-6 text-center">
-              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-500 shadow-glow">
-                <Heart className="h-8 w-8 text-white" />
+              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl gradient-gold shadow-glow">
+                <Heart className="h-8 w-8 text-primary-foreground" />
               </div>
               <DialogHeader>
                 <DialogTitle className="text-2xl font-extrabold">Gefällt dir TankFinder?</DialogTitle>
                 <DialogDescription className="mt-2">
-                  Hilf uns mit <strong className="text-yellow-400">5 Sternen</strong> und einer netten
+                  Hilf uns mit <strong className="text-primary">5 Sternen</strong> und einer netten
                   Bewertung im Play Store. Das motiviert uns enorm! 🙏
                 </DialogDescription>
               </DialogHeader>
@@ -212,7 +263,7 @@ export default function SettingsMenu() {
                 {[0, 1, 2, 3, 4].map((i) => (
                   <Star
                     key={i}
-                    className="h-9 w-9 fill-yellow-400 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+                    className="h-9 w-9 fill-primary text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]"
                     style={{ animation: `pulse 1.5s ease-in-out ${i * 0.15}s infinite` }}
                   />
                 ))}
@@ -222,16 +273,23 @@ export default function SettingsMenu() {
 
           <div className="space-y-3 px-6 pb-6">
             <Button
-              asChild
-              className="w-full gradient-primary text-primary-foreground shadow-glow rounded-xl"
+              onClick={() => openExternal(PLAY_STORE_URL)}
+              className="w-full gradient-gold text-primary-foreground shadow-glow rounded-xl font-bold"
               size="lg"
             >
-              <a href={PLAY_STORE_URL} target="_blank" rel="noreferrer">
-                <Star className="mr-2 h-4 w-4" />
-                Jetzt bewerten
-              </a>
+              <Star className="mr-2 h-4 w-4" />
+              Jetzt 5 Sterne geben
             </Button>
-            <Button variant="outline" className="w-full rounded-xl" onClick={copyLink}>
+            <Button
+              onClick={() => openExternal(PLAY_STORE_REVIEW_URL)}
+              variant="outline"
+              className="w-full rounded-xl border-primary/40 text-primary hover:bg-primary/10"
+              size="lg"
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Kommentar schreiben
+            </Button>
+            <Button variant="ghost" className="w-full rounded-xl" onClick={copyLink}>
               {copied ? <Check className="mr-2 h-4 w-4 text-secondary" /> : <Copy className="mr-2 h-4 w-4" />}
               {copied ? "Link kopiert!" : "Link kopieren"}
             </Button>
