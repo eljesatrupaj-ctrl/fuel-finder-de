@@ -8,12 +8,10 @@ import { useToast } from "@/hooks/use-toast";
 import RegionPicker from "@/components/RegionPicker";
 import StationCard from "@/components/StationCard";
 import AdBanner from "@/components/AdBanner";
-import OnboardingDialog from "@/components/OnboardingDialog";
 import SettingsMenu from "@/components/SettingsMenu";
 import { fetchStations, type Station } from "@/lib/tankerkoenig";
 
 const STORAGE_KEY = "tankfinder.lastLocation";
-const ONBOARDED_KEY = "tankfinder.onboarded";
 
 type FuelType = "all" | "e5" | "e10" | "diesel";
 
@@ -33,13 +31,7 @@ export default function Index() {
   const [fuel, setFuel] = useState<FuelType>("all");
   const [radius, setRadius] = useState(10);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [onboardingOpen, setOnboardingOpen] = useState(() => {
-    try {
-      return !localStorage.getItem(ONBOARDED_KEY) && !localStorage.getItem(STORAGE_KEY);
-    } catch {
-      return true;
-    }
-  });
+  const [autoLocationRequested, setAutoLocationRequested] = useState(false);
   const selectedFuel = fuel === "all" ? "e5" : fuel;
 
   const persistLoc = (l: { lat: number; lng: number; label: string } | null) => {
@@ -47,7 +39,6 @@ export default function Index() {
     try {
       if (l) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(l));
-        localStorage.setItem(ONBOARDED_KEY, "1");
       }
     } catch {}
   };
@@ -73,6 +64,12 @@ export default function Index() {
       { enableHighAccuracy: true, timeout: 10000 }
     );
   };
+
+  useEffect(() => {
+    if (loc || autoLocationRequested) return;
+    setAutoLocationRequested(true);
+    useGPS();
+  }, [autoLocationRequested, loc]);
 
   useEffect(() => {
     if (!loc) return;
@@ -145,7 +142,7 @@ export default function Index() {
           <div className="flex items-center gap-2.5 min-w-0">
             {loc && (
               <Button
-                onClick={() => { persistLoc(null); try { localStorage.removeItem(STORAGE_KEY); } catch {} setOnboardingOpen(true); }}
+                onClick={() => { persistLoc(null); try { localStorage.removeItem(STORAGE_KEY); } catch {} setAutoLocationRequested(true); }}
                 size="icon"
                 variant="ghost"
                 className="h-9 w-9 shrink-0 rounded-full"
@@ -171,7 +168,7 @@ export default function Index() {
                   <span className="hidden sm:inline">Bundesländer</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(110px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
+              <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(176px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
                 <SheetHeader>
                   <SheetTitle>Bundesländer</SheetTitle>
                   <SheetDescription>Wähle ein Bundesland und eine Stadt, um Tankstellen in der Nähe zu sehen.</SheetDescription>
@@ -249,7 +246,7 @@ export default function Index() {
       )}
 
       {/* MAIN */}
-      <main className="flex-1 pb-[calc(96px+env(safe-area-inset-bottom,0px))]">
+      <main className="flex-1 pb-[calc(168px+env(safe-area-inset-bottom,0px))]">
         <div className="container mx-auto px-4 py-6">
           {loc && (
             <div className="mb-5 space-y-4">
@@ -364,15 +361,7 @@ export default function Index() {
         </div>
       </main>
 
-      <AdBanner />
-      <OnboardingDialog
-        open={onboardingOpen}
-        onOpenChange={setOnboardingOpen}
-        onConfirm={(p) => {
-          persistLoc(p);
-          setOnboardingOpen(false);
-        }}
-      />
+      <AdBanner onGPS={useGPS} onRegions={() => setSheetOpen(true)} loading={loading} />
     </div>
   );
 }

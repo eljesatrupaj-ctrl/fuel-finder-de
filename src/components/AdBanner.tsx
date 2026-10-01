@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Sparkles } from "lucide-react";
+import { LocateFixed, MapPinned, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const ADMOB_BANNER_ID = "ca-app-pub-1262030761712683/8736767962";
 
@@ -8,7 +9,13 @@ const ADMOB_BANNER_ID = "ca-app-pub-1262030761712683/8736767962";
  * - Native (Capacitor): shfaq banerin real në fund të ekranit.
  * - Web: shfaq një placeholder premium.
  */
-export default function AdBanner() {
+type Props = {
+  onGPS: () => void;
+  onRegions: () => void;
+  loading?: boolean;
+};
+
+export default function AdBanner({ onGPS, onRegions, loading = false }: Props) {
   const [isNative, setIsNative] = useState(false);
 
   useEffect(() => {
@@ -44,23 +51,43 @@ export default function AdBanner() {
     };
   }, []);
 
-  if (isNative) return null;
-
   return (
     <footer
-      className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-border/60 bg-background/90 backdrop-blur-2xl"
-      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)", paddingTop: "0.5rem" }}
+      className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-border/70 bg-background/95 shadow-elevated backdrop-blur-2xl"
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
-      <div className="container mx-auto flex flex-col items-center gap-1.5 px-4">
-        <div className="relative flex h-14 w-full max-w-[728px] items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-card via-card/80 to-card shadow-card">
-          <div className="absolute inset-0 opacity-30 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10" />
-          <div className="relative flex items-center gap-2 text-xs text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <span className="font-semibold tracking-widest uppercase">Anzeige</span>
-            <span className="opacity-60">· AdMob</span>
-          </div>
+      <div className="mx-auto w-full max-w-3xl px-3 pt-2.5">
+        <div className="grid grid-cols-2 gap-2.5">
+          <Button
+            onClick={onGPS}
+            disabled={loading}
+            className="h-12 rounded-xl gradient-primary font-bold text-primary-foreground shadow-glow"
+          >
+            <LocateFixed className={loading ? "animate-pulse" : ""} />
+            {loading ? "Suche…" : "GPS nutzen"}
+          </Button>
+          <Button
+            onClick={onRegions}
+            variant="outline"
+            className="h-12 rounded-xl border-primary/35 bg-card font-bold text-foreground shadow-card"
+          >
+            <MapPinned />
+            Bundesland & Stadt
+          </Button>
         </div>
-        <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70">
+
+        {isNative ? (
+          <div className="h-[58px]" aria-hidden="true" />
+        ) : (
+          <div className="mt-2 flex h-[50px] items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-card">
+            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              <span className="font-semibold uppercase tracking-[0.18em]">Anzeige</span>
+              <span className="opacity-60">· AdMob</span>
+            </div>
+          </div>
+        )}
+        <p className="py-1 text-center text-[9px] uppercase tracking-[0.18em] text-muted-foreground/70">
           Krijuar nga <span className="font-semibold text-foreground/80">DS Interactive</span>
         </p>
       </div>
