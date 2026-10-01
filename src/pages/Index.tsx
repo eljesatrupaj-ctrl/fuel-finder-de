@@ -168,7 +168,7 @@ export default function Index() {
                   <span className="hidden sm:inline">Bundesländer</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(110px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
+              <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(176px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
                 <SheetHeader>
                   <SheetTitle>Bundesländer</SheetTitle>
                   <SheetDescription>Wähle ein Bundesland und eine Stadt, um Tankstellen in der Nähe zu sehen.</SheetDescription>
