@@ -53,26 +53,26 @@ export default function AdBanner({ onGPS, onRegions, loading = false }: Props) {
 
   return (
     <footer
-      className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-border/70 bg-background/95 shadow-elevated backdrop-blur-2xl"
+      className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-border/70 bg-card/95 shadow-elevated backdrop-blur-2xl"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="mx-auto w-full max-w-3xl px-3 pt-2.5">
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-2 rounded-2xl border border-border/60 bg-background/90 p-1.5 shadow-card">
           <Button
             onClick={onGPS}
             disabled={loading}
-            className="h-12 rounded-xl gradient-primary font-bold text-primary-foreground shadow-glow"
+            className="h-11 rounded-xl gradient-primary font-bold text-primary-foreground"
           >
             <LocateFixed className={loading ? "animate-pulse" : ""} />
-            {loading ? "Suche…" : "GPS nutzen"}
+            {loading ? "Suche…" : "In der Nähe"}
           </Button>
           <Button
             onClick={onRegions}
             variant="outline"
-            className="h-12 rounded-xl border-primary/35 bg-card font-bold text-foreground shadow-card"
+            className="h-11 rounded-xl border-transparent bg-transparent font-bold text-muted-foreground shadow-none hover:bg-card"
           >
             <MapPinned />
-            Bundesland & Stadt
+            Nach Region
           </Button>
         </div>
 
