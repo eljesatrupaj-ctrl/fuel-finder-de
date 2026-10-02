@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Fuel, Locate, Loader2, Search, AlertTriangle, MapPin, TrendingDown, Sparkles, ArrowLeft } from "lucide-react";
+import { Fuel, Locate, Loader2, Search, AlertTriangle, MapPin, TrendingDown, Sparkles, ArrowLeft, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -135,37 +135,36 @@ export default function Index() {
       style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
       {/* HEADER */}
-      <header className="sticky z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl"
+      <header className="relative z-40 overflow-hidden rounded-b-[2rem] gradient-hero text-primary-foreground shadow-elevated"
         style={{ top: "env(safe-area-inset-top, 0px)" }}
       >
-        <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-3">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 pb-14 pt-5 sm:px-6">
           <div className="flex items-center gap-2.5 min-w-0">
             {loc && (
               <Button
                 onClick={() => { persistLoc(null); try { localStorage.removeItem(STORAGE_KEY); } catch {} setAutoLocationRequested(true); }}
                 size="icon"
                 variant="ghost"
-                className="h-9 w-9 shrink-0 rounded-full"
+                className="h-10 w-10 shrink-0 rounded-xl bg-card/20 hover:bg-card/30"
                 aria-label="Zurück"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             )}
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl gradient-primary shadow-glow">
-              <Fuel className="h-5 w-5 text-primary-foreground" />
-              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-secondary ring-2 ring-background animate-pulse" />
+            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-card/20 backdrop-blur">
+              <Fuel className="h-6 w-6" />
+              <span className="absolute -right-1 -top-1 h-2.5 w-2.5 animate-pulse rounded-full bg-secondary ring-2 ring-primary" />
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-base font-extrabold leading-tight tracking-tight">TankFinder</h1>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Live-Spritpreise</p>
+              <h1 className="font-display truncate text-xl font-extrabold leading-tight">In der Nähe</h1>
+              <p className="text-[10px] font-semibold uppercase opacity-75">Live Preise per GPS</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="shrink-0 gap-2 rounded-full border-border/80">
+                <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-xl bg-card/20 hover:bg-card/30" aria-label="Bundesländer">
                   <Search className="h-4 w-4" />
-                  <span className="hidden sm:inline">Bundesländer</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(176px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
@@ -186,6 +185,7 @@ export default function Index() {
             <SettingsMenu />
           </div>
         </div>
+        <p className="absolute bottom-5 left-4 text-[10px] font-semibold uppercase opacity-70 sm:left-6">Krijuar nga DS Interactive</p>
       </header>
 
       {/* HERO */}
@@ -246,62 +246,28 @@ export default function Index() {
       )}
 
       {/* MAIN */}
-      <main className="flex-1 pb-[calc(168px+env(safe-area-inset-bottom,0px))]">
-        <div className="container mx-auto px-4 py-6">
+       <main className="flex-1 pb-[calc(168px+env(safe-area-inset-bottom,0px))]">
+         <div className="mx-auto w-full max-w-3xl px-4 pb-6">
           {loc && (
-            <div className="mb-5 space-y-4">
-              <div className="relative overflow-hidden rounded-[1.35rem] border border-border/80 gradient-card p-4 shadow-card">
-                <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-primary/10 blur-2xl" />
-                <div className="relative flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                    <MapPin className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Suche um</div>
-                    <div className="font-semibold">{loc.label}</div>
-                  </div>
+            <div className="mb-5 space-y-5">
+              <Tabs value={fuel} onValueChange={(v) => setFuel(v as FuelType)} className="relative -mt-7">
+                <TabsList className="grid h-auto w-full grid-cols-4 rounded-2xl border border-border/70 bg-card p-1.5 shadow-elevated">
+                  <TabsTrigger value="all" className="rounded-xl py-3 text-xs">Alle</TabsTrigger>
+                  <TabsTrigger value="diesel" className="rounded-xl py-3 text-xs">Diesel</TabsTrigger>
+                  <TabsTrigger value="e5" className="rounded-xl py-3 text-xs">Super 95</TabsTrigger>
+                  <TabsTrigger value="e10" className="rounded-xl py-3 text-xs">E10</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <div>
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground">{sortedStations.length} Tankstellen in der Nähe</p>
+                  <p className="mt-1 flex items-center gap-1 text-xs font-semibold text-secondary"><MapPin className="h-3 w-3" /> {loc.label} · {radius} km</p>
                 </div>
-                <div className="flex gap-2">
-                  <Button onClick={useGPS} size="sm" variant="outline" className="rounded-full">
-                    <Locate className="mr-1.5 h-4 w-4" /> GPS
-                  </Button>
-                  <Button onClick={() => setSheetOpen(true)} size="sm" variant="outline" className="rounded-full">
-                    Ändern
-                  </Button>
-                </div>
-                </div>
+                <Button onClick={useGPS} variant="ghost" size="sm" className="text-secondary hover:bg-secondary/10 hover:text-secondary"><RefreshCw className="mr-1.5 h-4 w-4" />Aktualisieren</Button>
               </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <Tabs value={fuel} onValueChange={(v) => setFuel(v as FuelType)}>
-                  <TabsList>
-                    <TabsTrigger value="all">Alle</TabsTrigger>
-                    <TabsTrigger value="e5">E5</TabsTrigger>
-                    <TabsTrigger value="e10">E10</TabsTrigger>
-                    <TabsTrigger value="diesel">Diesel</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-                <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/10 px-3 py-1.5 text-xs font-bold text-secondary">
-                  <TrendingDown className="h-3.5 w-3.5" />
-                  Günstigste oben
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Umkreis:</span>
-                  {[5, 10, 20, 25].map((r) => (
-                    <button
-                      key={r}
-                      onClick={() => setRadius(r)}
-                      className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                        radius === r
-                          ? "border-primary bg-primary/15 text-primary"
-                          : "border-border text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {r} km
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                {[5, 10, 20, 25].map((r) => <Button key={r} onClick={() => setRadius(r)} variant={radius === r ? "default" : "outline"} size="sm" className="h-8 shrink-0 rounded-full text-xs">{r} km</Button>)}
+                <div className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full bg-secondary/10 px-2.5 py-1.5 text-[10px] font-bold text-secondary"><TrendingDown className="h-3 w-3" /> günstigste zuerst</div>
               </div>
             </div>
           )}
@@ -328,16 +294,7 @@ export default function Index() {
 
           {!loading && !missingKey && sortedStations.length > 0 && (
             <>
-              {cheapest != null && (
-                <div className="mb-4 inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-4 py-1.5 text-xs">
-                  <TrendingDown className="h-3.5 w-3.5 text-secondary" />
-                  <span className="font-bold text-secondary">
-                    Bester Preis ({fuelLabel}): {cheapest.toFixed(3).replace(".", ",")} €
-                  </span>
-                  <span className="text-muted-foreground">· {sortedStations.length} Tankstellen · günstig → teuer</span>
-                </div>
-              )}
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="space-y-4">
                 {sortedStations.map((s, i) => (
                   <StationCard
                     key={s.id}
