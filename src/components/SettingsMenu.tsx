@@ -111,7 +111,7 @@ export default function SettingsMenu() {
       title: "App teilen",
       desc: "Empfehle TankFinder deinen Freunden",
       onClick: shareApp,
-      accent: "from-secondary/25 to-secondary/5 text-secondary border-secondary/35",
+      accent: "from-accent/30 to-accent/10 text-accent-foreground border-accent/40",
     },
     {
       icon: Shield,
@@ -238,8 +238,10 @@ export default function SettingsMenu() {
             <div>
               <h4 className="mb-1 font-semibold text-foreground">4. Lokale Speicherung</h4>
               <p>
-                Deine zuletzt gewählte Region wird ausschließlich lokal in deinem Browser/Gerät gespeichert
-                (LocalStorage), um beim nächsten Start direkt Ergebnisse anzeigen zu können.
+                Deine zuletzt gewählte Region sowie deine Tankbuch-Einträge (Datum, Kilometerstand,
+                Liter, Kraftstoffart und Preis) werden ausschließlich lokal in deinem Browser/Gerät
+                gespeichert (LocalStorage) und nicht an unsere Server übertragen. Du kannst einzelne
+                Tankbuch-Einträge jederzeit in der App löschen.
               </p>
             </div>
             <div>
