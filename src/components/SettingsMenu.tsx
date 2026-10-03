@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Settings, Share2, Star, Shield, Sparkles, ExternalLink, Heart, Copy, Check, MessageSquare } from "lucide-react";
+import { Settings, Share2, Star, Shield, Sparkles, ExternalLink, Heart, Copy, Check, MessageSquare, Fuel } from "lucide-react";
+import FuelLog from "@/components/FuelLog";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -55,6 +56,7 @@ export default function SettingsMenu() {
   const [open, setOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [rateOpen, setRateOpen] = useState(false);
+  const [fuelLogOpen, setFuelLogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const shareApp = async () => {
