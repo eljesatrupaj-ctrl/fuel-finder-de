@@ -93,11 +93,18 @@ export default function SettingsMenu() {
 
   const items = [
     {
+      icon: Fuel,
+      title: "Mein Tankbuch",
+      desc: "Tankfüllungen, Kosten & Verbrauch",
+      onClick: () => setFuelLogOpen(true),
+      accent: "from-primary/25 to-primary/5 text-primary border-primary/35",
+    },
+    {
       icon: Star,
       title: "App bewerten",
       desc: "Hilf uns mit 5 Sternen im Play Store",
       onClick: () => setRateOpen(true),
-      accent: "from-primary/25 to-primary/5 text-primary border-primary/35",
+      accent: "from-secondary/25 to-secondary/5 text-secondary border-secondary/35",
     },
     {
       icon: Share2,
