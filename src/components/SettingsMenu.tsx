@@ -184,6 +184,22 @@ export default function SettingsMenu() {
         </SheetContent>
       </Sheet>
 
+      {/* Tankbuch Dialog */}
+      <Dialog open={fuelLogOpen} onOpenChange={setFuelLogOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto pb-[calc(24px+env(safe-area-inset-bottom,0px))] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Fuel className="h-5 w-5 text-primary" />
+              Mein Tankbuch
+            </DialogTitle>
+            <DialogDescription>
+              Erfasse deine Tankfüllungen — Kosten und Verbrauch werden automatisch berechnet.
+            </DialogDescription>
+          </DialogHeader>
+          <FuelLog />
+        </DialogContent>
+      </Dialog>
+
       {/* Privacy Dialog */}
       <Dialog open={privacyOpen} onOpenChange={setPrivacyOpen}>
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
