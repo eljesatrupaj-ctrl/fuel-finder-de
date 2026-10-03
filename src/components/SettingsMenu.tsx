@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Settings, Share2, Star, Shield, Sparkles, ExternalLink, Heart, Copy, Check, MessageSquare } from "lucide-react";
+import { Settings, Share2, Star, Shield, Sparkles, ExternalLink, Heart, Copy, Check, MessageSquare, Fuel } from "lucide-react";
+import FuelLog from "@/components/FuelLog";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -55,6 +56,7 @@ export default function SettingsMenu() {
   const [open, setOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [rateOpen, setRateOpen] = useState(false);
+  const [fuelLogOpen, setFuelLogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const shareApp = async () => {
@@ -91,18 +93,25 @@ export default function SettingsMenu() {
 
   const items = [
     {
+      icon: Fuel,
+      title: "Mein Tankbuch",
+      desc: "Tankfüllungen, Kosten & Verbrauch",
+      onClick: () => setFuelLogOpen(true),
+      accent: "from-primary/25 to-primary/5 text-primary border-primary/35",
+    },
+    {
       icon: Star,
       title: "App bewerten",
       desc: "Hilf uns mit 5 Sternen im Play Store",
       onClick: () => setRateOpen(true),
-      accent: "from-primary/25 to-primary/5 text-primary border-primary/35",
+      accent: "from-secondary/25 to-secondary/5 text-secondary border-secondary/35",
     },
     {
       icon: Share2,
       title: "App teilen",
       desc: "Empfehle TankFinder deinen Freunden",
       onClick: shareApp,
-      accent: "from-secondary/25 to-secondary/5 text-secondary border-secondary/35",
+      accent: "from-accent/30 to-accent/10 text-accent-foreground border-accent/40",
     },
     {
       icon: Shield,
@@ -175,6 +184,22 @@ export default function SettingsMenu() {
         </SheetContent>
       </Sheet>
 
+      {/* Tankbuch Dialog */}
+      <Dialog open={fuelLogOpen} onOpenChange={setFuelLogOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto pb-[calc(24px+env(safe-area-inset-bottom,0px))] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Fuel className="h-5 w-5 text-primary" />
+              Mein Tankbuch
+            </DialogTitle>
+            <DialogDescription>
+              Erfasse deine Tankfüllungen — Kosten und Verbrauch werden automatisch berechnet.
+            </DialogDescription>
+          </DialogHeader>
+          <FuelLog />
+        </DialogContent>
+      </Dialog>
+
       {/* Privacy Dialog */}
       <Dialog open={privacyOpen} onOpenChange={setPrivacyOpen}>
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
@@ -229,8 +254,10 @@ export default function SettingsMenu() {
             <div>
               <h4 className="mb-1 font-semibold text-foreground">4. Lokale Speicherung</h4>
               <p>
-                Deine zuletzt gewählte Region wird ausschließlich lokal in deinem Browser/Gerät gespeichert
-                (LocalStorage), um beim nächsten Start direkt Ergebnisse anzeigen zu können.
+                Deine zuletzt gewählte Region sowie deine Tankbuch-Einträge (Datum, Kilometerstand,
+                Liter, Kraftstoffart und Preis) werden ausschließlich lokal in deinem Browser/Gerät
+                gespeichert (LocalStorage) und nicht an unsere Server übertragen. Du kannst einzelne
+                Tankbuch-Einträge jederzeit in der App löschen.
               </p>
             </div>
             <div>
