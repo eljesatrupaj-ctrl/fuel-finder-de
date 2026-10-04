@@ -29,12 +29,12 @@ export default function StationCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.4) }}
-      className={`group relative overflow-hidden rounded-2xl border bg-card shadow-card transition-all hover:-translate-y-0.5 hover:shadow-elevated ${isBest ? "border-secondary/55 ring-1 ring-secondary/20" : "border-border/80"}`}
+      className={`group relative overflow-hidden rounded-xl border bg-card shadow-card transition-all hover:-translate-y-0.5 hover:shadow-elevated ${isBest ? "border-secondary/55 ring-1 ring-secondary/20" : "border-border/80"}`}
     >
       {isBest && <div className="absolute inset-x-0 top-0 h-1 bg-secondary" />}
-      <div className="p-4 sm:p-5">
+      <div className="p-3 sm:p-4">
         {isBest && (
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[10px] font-extrabold uppercase text-secondary-foreground">
+          <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[9px] font-extrabold uppercase text-secondary-foreground">
             <Trophy className="h-3 w-3" /> Günstigster
           </div>
         )}
@@ -42,27 +42,27 @@ export default function StationCard({
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               {!isBest && rank != null && <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-bold text-muted-foreground">{rank}</span>}
-              <h3 className="font-display truncate text-base font-extrabold sm:text-lg">{s.name}</h3>
+              <h3 className="font-display truncate text-sm font-extrabold sm:text-base">{s.name}</h3>
             </div>
-            <p className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
               <MapPin className="h-3 w-3 shrink-0" />
               <span className="truncate">{s.street} {s.houseNumber}, {s.postCode} {s.place}</span>
             </p>
           </div>
           <div className="shrink-0 text-right">
-            {priceParts ? <div className={`font-display text-3xl font-extrabold tabular-nums ${isBest ? "text-secondary" : "text-foreground"}`}><span className="mr-1 text-xs">€</span>{priceParts[0]},{priceParts[1]}</div> : <div className="text-2xl font-extrabold text-muted-foreground">—</div>}
-            <p className="mt-1 text-[9px] font-bold uppercase text-muted-foreground">Pro Liter</p>
+            {priceParts ? <div className={`font-display text-2xl font-extrabold tabular-nums ${isBest ? "text-secondary" : "text-foreground"}`}><span className="mr-1 text-[10px]">€</span>{priceParts[0]},{priceParts[1]}</div> : <div className="text-xl font-extrabold text-muted-foreground">—</div>}
+            <p className="text-[8px] font-bold uppercase text-muted-foreground">Pro Liter</p>
           </div>
         </div>
 
-        <div className="mt-4 flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary/14 px-3 py-1.5 text-[11px] font-bold text-primary-foreground"><Navigation className="h-3 w-3" /> {s.dist.toFixed(1)} km</span>
-          <span className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-bold ${s.isOpen ? "bg-secondary/10 text-secondary" : "bg-destructive/10 text-destructive"}`}><Clock className="h-3 w-3" /> {s.isOpen ? "Offen" : "Geschlossen"}</span>
+        <div className="mt-2.5 flex items-center gap-2">
+          <span className="inline-flex items-center gap-1 rounded-md bg-primary/14 px-2 py-1 text-[10px] font-bold text-primary-foreground"><Navigation className="h-3 w-3" /> {s.dist.toFixed(1)} km</span>
+          <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-bold ${s.isOpen ? "bg-secondary/10 text-secondary" : "bg-destructive/10 text-destructive"}`}><Clock className="h-3 w-3" /> {s.isOpen ? "Offen" : "Geschlossen"}</span>
         </div>
 
         <Button
           onClick={() => openInMaps(s)}
-          className={`mt-4 h-12 w-full rounded-xl font-bold ${isBest ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : "gradient-primary text-primary-foreground hover:opacity-90"}`}
+          className={`mt-2.5 h-9 w-full rounded-lg text-sm font-bold ${isBest ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : "gradient-primary text-primary-foreground hover:opacity-90"}`}
         >
           <Navigation className="mr-2 h-4 w-4" />
           Route anzeigen
