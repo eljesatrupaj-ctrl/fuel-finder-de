@@ -135,10 +135,8 @@ export default function Index() {
       style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
       {/* HEADER */}
-      <header className="relative z-40 overflow-hidden rounded-b-[2rem] gradient-hero text-primary-foreground shadow-elevated"
-        style={{ top: "env(safe-area-inset-top, 0px)" }}
-      >
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 pb-14 pt-5 sm:px-6">
+      <header className="relative z-40 overflow-hidden rounded-b-[1.5rem] gradient-hero text-primary-foreground shadow-elevated">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-2.5 px-4 pb-10 pt-4 sm:px-6">
           <div className="flex items-center gap-2.5 min-w-0">
             {loc && (
               <Button
@@ -151,12 +149,12 @@ export default function Index() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             )}
-            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-card/20 backdrop-blur">
-              <Fuel className="h-6 w-6" />
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-card/20 backdrop-blur">
+              <Fuel className="h-5 w-5" />
               <span className="absolute -right-1 -top-1 h-2.5 w-2.5 animate-pulse rounded-full bg-secondary ring-2 ring-primary" />
             </div>
             <div className="min-w-0">
-              <h1 className="font-display truncate text-xl font-extrabold leading-tight">In der Nähe</h1>
+              <h1 className="font-display truncate text-lg font-extrabold leading-tight">In der Nähe</h1>
               <p className="text-[10px] font-semibold uppercase opacity-75">Live Preise per GPS</p>
             </div>
           </div>
@@ -185,7 +183,7 @@ export default function Index() {
             <SettingsMenu />
           </div>
         </div>
-        <p className="absolute bottom-5 left-4 text-[10px] font-semibold uppercase opacity-70 sm:left-6">Krijuar nga DS Interactive</p>
+        <p className="absolute bottom-3 left-4 text-[9px] font-semibold uppercase opacity-70 sm:left-6">Krijuar nga DS Interactive</p>
       </header>
 
       {/* HERO */}
@@ -247,15 +245,15 @@ export default function Index() {
 
       {/* MAIN */}
        <main className="flex-1 pb-[calc(168px+env(safe-area-inset-bottom,0px))]">
-         <div className="mx-auto w-full max-w-3xl px-4 pb-6">
+          <div className="mx-auto w-full max-w-3xl px-3 pb-6 sm:px-4">
           {loc && (
-            <div className="mb-5 space-y-5">
-              <Tabs value={fuel} onValueChange={(v) => setFuel(v as FuelType)} className="relative -mt-7">
-                <TabsList className="grid h-auto w-full grid-cols-4 rounded-2xl border border-border/70 bg-card p-1.5 shadow-elevated">
-                  <TabsTrigger value="all" className="rounded-xl py-3 text-xs">Alle</TabsTrigger>
-                  <TabsTrigger value="diesel" className="rounded-xl py-3 text-xs">Diesel</TabsTrigger>
-                  <TabsTrigger value="e5" className="rounded-xl py-3 text-xs">Super 95</TabsTrigger>
-                  <TabsTrigger value="e10" className="rounded-xl py-3 text-xs">E10</TabsTrigger>
+            <div className="mb-3 space-y-3 pt-3">
+              <Tabs value={fuel} onValueChange={(v) => setFuel(v as FuelType)}>
+                <TabsList className="grid h-auto w-full grid-cols-4 rounded-xl border border-border/70 bg-card p-1 shadow-card">
+                  <TabsTrigger value="all" className="rounded-lg py-2 text-[11px]">Alle</TabsTrigger>
+                  <TabsTrigger value="diesel" className="rounded-lg py-2 text-[11px]">Diesel</TabsTrigger>
+                  <TabsTrigger value="e5" className="rounded-lg py-2 text-[11px]">Super 95</TabsTrigger>
+                  <TabsTrigger value="e10" className="rounded-lg py-2 text-[11px]">E10</TabsTrigger>
                 </TabsList>
               </Tabs>
               <div className="flex items-center justify-between gap-3 pt-1">
@@ -265,9 +263,9 @@ export default function Index() {
                 </div>
                 <Button onClick={useGPS} variant="ghost" size="sm" className="text-secondary hover:bg-secondary/10 hover:text-secondary"><RefreshCw className="mr-1.5 h-4 w-4" />Aktualisieren</Button>
               </div>
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-                {[5, 10, 20, 25].map((r) => <Button key={r} onClick={() => setRadius(r)} variant={radius === r ? "default" : "outline"} size="sm" className="h-8 shrink-0 rounded-full text-xs">{r} km</Button>)}
-                <div className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full bg-secondary/10 px-2.5 py-1.5 text-[10px] font-bold text-secondary"><TrendingDown className="h-3 w-3" /> günstigste zuerst</div>
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {[5, 10, 20, 25].map((r) => <Button key={r} onClick={() => setRadius(r)} variant={radius === r ? "default" : "outline"} size="sm" className="h-7 shrink-0 rounded-full px-3 text-[11px]">{r} km</Button>)}
+                <div className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full bg-secondary/10 px-2 py-1.5 text-[9px] font-bold text-secondary"><TrendingDown className="h-3 w-3" /> günstigste zuerst</div>
               </div>
             </div>
           )}
@@ -294,7 +292,7 @@ export default function Index() {
 
           {!loading && !missingKey && sortedStations.length > 0 && (
             <>
-              <div className="space-y-4">
+              <div className="space-y-2.5">
                 {sortedStations.map((s, i) => (
                   <StationCard
                     key={s.id}
