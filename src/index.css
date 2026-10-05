@@ -84,6 +84,7 @@
   .gradient-card { background: var(--gradient-card); }
   .gradient-fuel { background: var(--gradient-fuel); }
   .gradient-gold { background: var(--gradient-gold); }
+  .hero-aurora { background: var(--gradient-emerald-sheen); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .shadow-elevated { box-shadow: var(--shadow-elevated); }

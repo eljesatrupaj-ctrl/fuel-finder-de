@@ -135,7 +135,9 @@ export default function Index() {
       style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
       {/* HEADER */}
-      <header className="relative z-40 overflow-hidden rounded-b-[1.5rem] gradient-hero text-primary-foreground shadow-elevated">
+      <header className="relative z-40 overflow-hidden rounded-b-[1.5rem] gradient-hero text-secondary-foreground shadow-elevated">
+        <div className="hero-aurora pointer-events-none absolute inset-0" aria-hidden="true" />
+
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-2.5 px-4 pb-10 pt-4 sm:px-6">
           <div className="flex items-center gap-2.5 min-w-0">
             {loc && (
@@ -151,7 +153,7 @@ export default function Index() {
             )}
             <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-card/20 backdrop-blur">
               <Fuel className="h-5 w-5" />
-              <span className="absolute -right-1 -top-1 h-2.5 w-2.5 animate-pulse rounded-full bg-secondary ring-2 ring-primary" />
+              <span className="absolute -right-1 -top-1 h-2.5 w-2.5 animate-pulse rounded-full bg-primary ring-2 ring-secondary/60" />
             </div>
             <div className="min-w-0">
               <h1 className="font-display truncate text-lg font-extrabold leading-tight">In der Nähe</h1>
