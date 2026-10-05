@@ -192,12 +192,13 @@ export default function Index() {
       {!loc && (
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 gradient-hero" />
-          <div className="absolute inset-0 opacity-[0.04] [background-image:linear-gradient(hsl(var(--foreground))_1px,transparent_1px),linear-gradient(90deg,hsl(var(--foreground))_1px,transparent_1px)] [background-size:48px_48px]" />
+          <div className="hero-aurora absolute inset-0" aria-hidden="true" />
+          <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(hsl(var(--secondary-foreground))_1px,transparent_1px),linear-gradient(90deg,hsl(var(--secondary-foreground))_1px,transparent_1px)] [background-size:48px_48px]" />
           <div className="relative container mx-auto flex flex-col items-center px-4 py-20 text-center sm:py-28">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-3.5 py-1.5 text-xs font-semibold text-primary shadow-glow"
             >
               <Sparkles className="h-3.5 w-3.5" />
               Über 16.000 Tankstellen · Echtzeit-Daten
@@ -214,7 +215,7 @@ export default function Index() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl"
+              className="max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight text-secondary-foreground sm:text-6xl"
             >
               Den <span className="text-gradient">günstigsten Sprit</span> in deiner Nähe finden
             </motion.h2>
@@ -222,7 +223,7 @@ export default function Index() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="mt-5 max-w-lg text-base text-muted-foreground sm:text-lg"
+              className="mt-5 max-w-lg text-base text-secondary-foreground/70 sm:text-lg"
             >
               Live-Preise für Super E5, E10 und Diesel von Tankerkönig. Per GPS oder manuell nach Bundesland & Stadt suchen.
             </motion.p>
@@ -236,7 +237,7 @@ export default function Index() {
                 <Locate className="mr-2 h-5 w-5" />
                 Standort verwenden
               </Button>
-              <Button onClick={() => setSheetOpen(true)} size="lg" variant="outline" className="rounded-full px-7">
+              <Button onClick={() => setSheetOpen(true)} size="lg" variant="outline" className="rounded-full border-secondary-foreground/30 px-7 text-secondary-foreground hover:bg-secondary-foreground/10 hover:text-secondary-foreground">
                 <MapPin className="mr-2 h-5 w-5" />
                 Stadt wählen
               </Button>
