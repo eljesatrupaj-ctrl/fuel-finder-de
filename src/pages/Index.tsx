@@ -33,6 +33,7 @@ export default function Index() {
   const [fuel, setFuel] = useState<FuelType>("all");
   const [radius, setRadius] = useState(10);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [calcOpen, setCalcOpen] = useState(false);
   const [autoLocationRequested, setAutoLocationRequested] = useState(false);
   const selectedFuel = fuel === "all" ? "e5" : fuel;
 
