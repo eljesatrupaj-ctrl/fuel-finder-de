@@ -181,7 +181,7 @@ export default function Index() {
             <SettingsMenu />
           </div>
         </div>
-        <p className="absolute bottom-3 left-4 text-[9px] font-semibold uppercase opacity-70 sm:left-6">Krijuar nga DS Interactive</p>
+        <p className="absolute bottom-3 left-4 text-[9px] font-semibold uppercase opacity-70 sm:left-6">Erstellt von DS Interactive</p>
       </header>
 
       {/* HERO */}

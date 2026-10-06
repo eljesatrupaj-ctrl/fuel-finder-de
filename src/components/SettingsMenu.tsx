@@ -178,7 +178,7 @@ export default function SettingsMenu() {
             <div className="text-sm font-bold">TankFinder DE</div>
             <div className="text-[11px] text-muted-foreground">Version 1.0 · Live-Spritpreise</div>
             <div className="mt-3 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/80">
-              Krijuar nga <span className="font-semibold text-primary">DS Interactive</span>
+              Erstellt von <span className="font-semibold text-primary">DS Interactive</span>
             </div>
           </div>
         </SheetContent>
