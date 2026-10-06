@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Fuel, Locate, Loader2, Search, AlertTriangle, MapPin, TrendingDown, Sparkles, ArrowLeft, RefreshCw } from "lucide-react";
+import { Fuel, Locate, Loader2, Calculator, AlertTriangle, MapPin, TrendingDown, Sparkles, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import RegionPicker from "@/components/RegionPicker";
 import StationCard from "@/components/StationCard";
+import FuelLog from "@/components/FuelLog";
 import AdBanner from "@/components/AdBanner";
 import SettingsMenu from "@/components/SettingsMenu";
 import { fetchStations, type Station } from "@/lib/tankerkoenig";
@@ -31,6 +33,7 @@ export default function Index() {
   const [fuel, setFuel] = useState<FuelType>("all");
   const [radius, setRadius] = useState(10);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [calcOpen, setCalcOpen] = useState(false);
   const [autoLocationRequested, setAutoLocationRequested] = useState(false);
   const selectedFuel = fuel === "all" ? "e5" : fuel;
 
@@ -140,17 +143,6 @@ export default function Index() {
 
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-2.5 px-4 pb-10 pt-4 sm:px-6">
           <div className="flex items-center gap-2.5 min-w-0">
-            {loc && (
-              <Button
-                onClick={() => { persistLoc(null); try { localStorage.removeItem(STORAGE_KEY); } catch {} setAutoLocationRequested(true); }}
-                size="icon"
-                variant="ghost"
-                className="h-10 w-10 shrink-0 rounded-xl bg-card/20 hover:bg-card/30"
-                aria-label="Zurück"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            )}
             <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-card/20 backdrop-blur">
               <Fuel className="h-5 w-5" />
               <span className="absolute -right-1 -top-1 h-2.5 w-2.5 animate-pulse rounded-full bg-primary ring-2 ring-secondary/60" />
@@ -161,12 +153,16 @@ export default function Index() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
+            <Button
+              onClick={() => setCalcOpen(true)}
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 shrink-0 rounded-xl bg-card/20 hover:bg-card/30"
+              aria-label="Sprit-Rechner"
+            >
+              <Calculator className="h-5 w-5" />
+            </Button>
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-xl bg-card/20 hover:bg-card/30" aria-label="Bundesländer">
-                  <Search className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
               <SheetContent side="right" className="w-full overflow-y-auto pb-[calc(176px+env(safe-area-inset-bottom,0px))] sm:max-w-md">
                 <SheetHeader>
                   <SheetTitle>Bundesländer</SheetTitle>
@@ -185,7 +181,7 @@ export default function Index() {
             <SettingsMenu />
           </div>
         </div>
-        <p className="absolute bottom-3 left-4 text-[9px] font-semibold uppercase opacity-70 sm:left-6">Krijuar nga DS Interactive</p>
+        <p className="absolute bottom-3 left-4 text-[9px] font-semibold uppercase opacity-70 sm:left-6">Erstellt von DS Interactive</p>
       </header>
 
       {/* HERO */}
@@ -320,6 +316,22 @@ export default function Index() {
       </main>
 
       <AdBanner onGPS={useGPS} onRegions={() => setSheetOpen(true)} loading={loading} />
+
+      {/* Sprit-Rechner Dialog */}
+      <Dialog open={calcOpen} onOpenChange={setCalcOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto pb-[calc(24px+env(safe-area-inset-bottom,0px))] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Calculator className="h-5 w-5 text-primary" />
+              Sprit-Rechner
+            </DialogTitle>
+            <DialogDescription>
+              Erfasse deine Tankfüllungen — Kosten und Verbrauch werden automatisch berechnet.
+            </DialogDescription>
+          </DialogHeader>
+          <FuelLog />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
