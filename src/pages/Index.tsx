@@ -316,6 +316,22 @@ export default function Index() {
       </main>
 
       <AdBanner onGPS={useGPS} onRegions={() => setSheetOpen(true)} loading={loading} />
+
+      {/* Sprit-Rechner Dialog */}
+      <Dialog open={calcOpen} onOpenChange={setCalcOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto pb-[calc(24px+env(safe-area-inset-bottom,0px))] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Calculator className="h-5 w-5 text-primary" />
+              Sprit-Rechner
+            </DialogTitle>
+            <DialogDescription>
+              Erfasse deine Tankfüllungen — Kosten und Verbrauch werden automatisch berechnet.
+            </DialogDescription>
+          </DialogHeader>
+          <FuelLog />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
