@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Fuel, Locate, Loader2, Search, AlertTriangle, MapPin, TrendingDown, Sparkles, ArrowLeft, RefreshCw } from "lucide-react";
+import { Fuel, Locate, Loader2, Calculator, AlertTriangle, MapPin, TrendingDown, Sparkles, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import RegionPicker from "@/components/RegionPicker";
 import StationCard from "@/components/StationCard";
+import FuelLog from "@/components/FuelLog";
 import AdBanner from "@/components/AdBanner";
 import SettingsMenu from "@/components/SettingsMenu";
 import { fetchStations, type Station } from "@/lib/tankerkoenig";
