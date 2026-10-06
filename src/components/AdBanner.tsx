@@ -88,7 +88,7 @@ export default function AdBanner({ onGPS, onRegions, loading = false }: Props) {
           </div>
         )}
         <p className="py-1 text-center text-[9px] uppercase tracking-[0.18em] text-muted-foreground/70">
-          Krijuar nga <span className="font-semibold text-foreground/80">DS Interactive</span>
+          Erstellt von <span className="font-semibold text-foreground/80">DS Interactive</span>
         </p>
       </div>
     </footer>
